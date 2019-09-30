@@ -14,7 +14,6 @@ public class War {
             RingBuffer<Integer> table = new RingBuffer<>(52);
             String order = "  23456789TJQKA";
 
-            int hand = 0;
 
             for (int i = 0; i < p1Hand.length; i++) {
                 p1.enqueue(order.indexOf(p1Hand[i].substring(0,1)));
@@ -23,31 +22,39 @@ public class War {
             for (int i = 0; i < p2Hand.length; i++) {
                 p2.enqueue(order.indexOf(p2Hand[i].substring(0,1)));
             }
-            try {
 
-                for (int i = 0; i < 100000; i++) {
-                    hand(p1, p2, table).enqueue(table);
-
-                    if (i >= 100000 - 1) {
-                        System.out.println("Tie game stopped at 100000 plays.");
-                    }
-
-                    hand = i;
+            for (int i = 0; i < 100000; i++) {
+                if(p1.isEmpty() && p2.isFull()){
+                    System.out.println("Player 2 wins!");
+                    break;
                 }
-            }
-            catch(IllegalStateException e){
-                    if (p1.isEmpty() && p2.isFull()) {
-                        System.out.println("Player 2 wins!");
-                    }
-                    else if(p1.isFull() && p2.isEmpty()) {
-                        System.out.println("Player 1 wins!");
-                    }
-                    else System.out.println("Something went wrong");
+                else if (p2.isEmpty() && p1.isFull()){
+                    System.out.println("Player 1 wins!");
+                    break;
+                }
+
+                RingBuffer<Integer> winner = hand(p1, p2, table);
+                if (winner != null){
+                    winner.enqueue(table);
+                }
+
+                if (i >= 100000 - 1) {
+                    System.out.println("Tie game stopped at 100000 plays.");
+                }
+
             }
         }
     }
 
     public static RingBuffer<Integer> hand(RingBuffer<Integer> r1, RingBuffer<Integer> r2,  RingBuffer<Integer> game) throws Exception{
+
+        if(r1.isEmpty()){
+            return null;
+        }
+        else if (r2.isEmpty()){
+            return null;
+        }
+
         int a = r1.dequeue();
         int b = r2.dequeue();
         game.enqueue(a);
@@ -64,6 +71,14 @@ public class War {
     }
 
     public static RingBuffer<Integer> war(RingBuffer<Integer> r1, RingBuffer<Integer> r2,  RingBuffer<Integer> game) throws Exception {
+
+        if(r1.isEmpty()){
+            return null;
+        }
+        else if (r2.isEmpty()){
+            return null;
+        }
+
         game.enqueue(r1.dequeue());
         game.enqueue(r2.dequeue());
 
